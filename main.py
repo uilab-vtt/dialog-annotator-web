@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return 'Hello World'
+    return 'color-annotator-web'
 
 def get_books():
     with open('./data/book_data.json', 'r') as f:
