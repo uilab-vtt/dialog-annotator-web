@@ -121,3 +121,36 @@ body {
     background-color: #444444;
     color: #ffffff;
 }
+
+.pagination {
+    display: flex;
+    margin: 0 auto;
+    padding: 16px 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination-button {
+    flex: 0 0 auto;
+    margin: 0 12px;
+    border: 1px solid #dddddd;
+    padding: 4px 8px;
+    font-size: 14px;
+    height: 24px;
+    line-height: 24px;
+    color: #444444;
+    cursor: pointer;
+}
+
+.pagination-button:hover {
+    border: 1px solid #444444;
+}
+
+.pagination-text {
+    flex: 0 0 auto;
+    margin: 0 12px;
+    font-size: 14px;
+    height: 24px;
+    line-height: 24px;
+    color: #444444;
+}
