@@ -104,6 +104,8 @@
             data: function() {
                 return {
                     cellIndex: 0,
+                    isActive: false,
+                    mouseTimestamp: null,
                 };
             },
             methods: {
@@ -119,9 +121,30 @@
                 setConfidence: function(value) {
                     this.$emit('set-confidence', this.book.id, value);
                 },
+                handleMouseOver: function() {
+                    this.isActive = true;
+                    this.mouseTimestamp = Date.now();
+                },
+                handleMouseOut: function() {
+                    this.isActive = false;
+                    this.$emit('add-seconds', this.mouseTimestamp - Date.now());
+                    this.mouseTimestamp = null;
+                },
             },
             template: /*html*/`
-                <div class="book-question">
+                <div 
+                    class="book-question"
+                    v-on:mouseover="handleMouseOver"
+                    v-on:mouseout="handleMouseOut"
+                >
+                    <div 
+                        v-if="!isActive"
+                        class="book-question-shade"
+                    >
+                        <div class="shade-text">
+                            Hover your mouse cursor on this box to work on this task.   
+                        </div>
+                    </div>
                     <div class="text-column">
                         <div class="genre">
                             Genre: [[ book.genre ]]
