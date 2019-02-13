@@ -11,6 +11,7 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
     <script>
         this._books = {{ books|tojson|safe }};
+        this._colors = {{ colors|tojson|safe }};
     </script>
 </head>
 
@@ -22,10 +23,12 @@
             </div>
             <book-question
                 v-for="book in pageBooks"
+                v-bind:key="book.id"
                 v-bind:book="book"
                 v-bind:response="responses[book.id]"
-                v-bind:key="book.id"
+                v-bind:colors="colors"
                 v-on:set-response="setResponse"
+                v-on:set-confidence="setConfidence"
                 v-on:add-seconds="addSeconds"
             ></book-question>
         </div>
@@ -36,6 +39,7 @@
             var book = this._books[i];
             responses[book.id] = {
                 cells: [],
+                confidence: null,
                 seconds: 0.0,
             };
             for (var j = 0; j < 5; j++) {
@@ -45,9 +49,15 @@
                 });
             }
         }
+        var paletteColors = this._colors;
         Vue.component('color-picker', {
             delimiters: ['[[', ']]'],
-            props: [],
+            props: [
+                'colors',
+            ],
+            data: function() {
+                return {};
+            },
             methods: {
                 handleColorClick: function(color) {
                     this.$emit('pick', color);
@@ -56,19 +66,11 @@
             template: /*html*/`
                 <div class="color-picker">
                     <div 
+                        v-for="color in colors"
+                        v-bind:key="color"
                         class="color-picker-cell"
-                        v-bind:style="{ backgroundColor: '#444444' }"
-                        v-on:click="() => handleColorClick('#444444')"
-                    ></div>
-                    <div 
-                        class="color-picker-cell"
-                        v-bind:style="{ backgroundColor: '#FF0000' }"
-                        v-on:click="() => handleColorClick('#FF0000')"
-                    ></div>
-                    <div 
-                        class="color-picker-cell"
-                        v-bind:style="{ backgroundColor: '#0000FF' }"
-                        v-on:click="() => handleColorClick('#0000FF')"
+                        v-bind:style="{ backgroundColor: color }"
+                        v-on:click="() => handleColorClick(color)"
                     ></div>
                 </div>
             `,
@@ -78,6 +80,7 @@
             props: [
                 'book',
                 'response',
+                'colors',
             ],
             data: function() {
                 return {
@@ -90,13 +93,19 @@
                 },
                 setCellColor: function(color) {
                     this.$emit('set-response', this.book.id, this.cellIndex, color, []);
+                    if (this.cellIndex < 5 - 1) {
+                        this.cellIndex += 1;
+                    }
+                },
+                setConfidence: function(value) {
+                    this.$emit('set-confidence', this.book.id, value);
                 },
             },
             template: /*html*/`
                 <div class="book-question">
                     <div class="text-column">
                         <div class="genre">
-                            [[ book.genre ]]
+                            Genre: [[ book.genre ]]
                         </div>
                         <div class="content-box">
                             <div class="booktitle">
@@ -108,21 +117,37 @@
                         </div>
                     </div>
                     <div class="form-column">
+                        <div class="form-section-title">
+                            Palette Color Picker
+                        </div>
                         <div class="palette">
                             <div 
                                 class="color-cell"
                                 v-for="(cell, i) in response.cells"
+                                v-bind:key="cell.color"
                                 v-bind:class="{ 'color-cell--active': i == cellIndex }"
                                 v-bind:style="{ backgroundColor: cell.color }"
                                 v-on:click="() => setCellIndex(i)"
                             ></div>
                         </div> 
-                        <div class="confidence-input">
-
-                        </div>
                         <color-picker
+                            v-bind:colors="colors"
                             v-on:pick="setCellColor"
                         ></color-picker>
+                        <div class="form-section-title">
+                            Confidence on Your Palette
+                        </div>
+                        <div class="confidence-input">
+                            <div 
+                                class="score-button"
+                                v-for="value in [1,2,3,4,5,6,7,8,9,10]"
+                                v-bind:key="value"
+                                v-bind:class="{ 'score-button--active': value == response.confidence }"
+                                v-on:click="() => setConfidence(value)"
+                            >
+                                [[ value ]]
+                            </div>
+                        </div>
                     </div>
                 </div>
             `,
@@ -132,6 +157,7 @@
             delimiters: ['[[', ']]'],
             data: {
                 books: this._books,
+                colors: this._colors,
                 responses: responses,
                 pageSize: 5,
                 page: 1,
@@ -155,6 +181,9 @@
                         tokens: tokens,
                     };
                     this.responses[bookId].cells = newCells;
+                },
+                setConfidence: function(bookId, score) {
+                    this.responses[bookId].confidence = score;
                 },
                 addSeconds: function(bookId, seconds) {
                     this.responses[bookId].seconds += seconds;

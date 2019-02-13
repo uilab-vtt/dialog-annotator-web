@@ -37,6 +37,8 @@ body {
     background-color: #ffffff;
     border: 1px solid #dddddd;
     padding: 8px 8px;
+    height: 250px;
+    overflow-y: auto;
 }
 
 .booktitle {
@@ -51,6 +53,13 @@ body {
 
 .form-column {
     flex: 0 0 400px;
+    padding: 0 12px;
+}
+
+.form-section-title {
+    padding: 4px 0;
+    font-size: 14px;
+    color: #444444;
 }
 
 .palette {
@@ -85,4 +94,30 @@ body {
     margin-bottom: 4px;
     height: 20px;
     cursor: pointer;
+}
+
+.confidence-input {
+    padding: 8px 0;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+}
+
+.score-button {
+    border: 1px solid #dddddd;
+    background-color: #ffffff;
+    flex: 0 0 30px;
+    margin-right: 4px;
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    color: #444444;
+}
+
+.score-button--active {
+    border: 1px solid #444444;
+    background-color: #444444;
+    color: #ffffff;
 }
