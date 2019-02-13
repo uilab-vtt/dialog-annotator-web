@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
 }
@@ -49,6 +53,7 @@ body {
 
 .description {
     font-size: 14px;
+    white-space: pre-wrap;
 }
 
 .form-column {
@@ -89,11 +94,16 @@ body {
 }
 
 .color-picker-cell {
-    flex: 0 0 20px;
+    border: 1px solid transparent;
+    flex: 0 0 19px;
     margin-right: 4px;
     margin-bottom: 4px;
-    height: 20px;
+    height: 19px;
     cursor: pointer;
+}
+
+.color-picker-cell:hover {
+    border: 1px solid #444444;
 }
 
 .confidence-input {
@@ -116,6 +126,10 @@ body {
     color: #444444;
 }
 
+.score-button:hover {
+    border: 1px solid #444444;
+}
+
 .score-button--active {
     border: 1px solid #444444;
     background-color: #444444;
@@ -136,8 +150,6 @@ body {
     border: 1px solid #dddddd;
     padding: 4px 8px;
     font-size: 14px;
-    height: 24px;
-    line-height: 24px;
     color: #444444;
     cursor: pointer;
 }
