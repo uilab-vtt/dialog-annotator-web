@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Color Annotator</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="{{ url_for('static', filename='survey.css') }}" rel="stylesheet">
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- production version, optimized for size and speed -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    <script>
+        this._books = {{ books|tojson|safe }};
+    </script>
+</head>
+
+<body>
+    <div id="survey-app" class="app">
+        <div class="container">
+            <div class="title">
+                Color Annotation Study
+            </div>
+            <book-question
+                v-for="book in pageBooks"
+                v-bind:book="book"
+                v-bind:response="responses[book.id]"
+                v-bind:key="book.id"
+                v-on:set-response="setResponse"
+                v-on:add-seconds="addSeconds"
+            ></book-question>
+        </div>
+    </div>
+    <script>
+        var responses = {};
+        for (var i = 0; i < this._books.length; i++) {
+            var book = this._books[i];
+            responses[book.id] = {
+                cells: [],
+                seconds: 0.0,
+            };
+            for (var j = 0; j < 5; j++) {
+                responses[book.id].cells.push({
+                    color: '#FFFFFF',
+                    tokens: [],
+                });
+            }
+        }
+        Vue.component('color-picker', {
+            delimiters: ['[[', ']]'],
+            props: [],
+            methods: {
+                handleColorClick: function(color) {
+                    this.$emit('pick', color);
+                }
+            },
+            template: /*html*/`
+                <div class="color-picker">
+                    <div 
+                        class="color-picker-cell"
+                        v-bind:style="{ backgroundColor: '#444444' }"
+                        v-on:click="() => handleColorClick('#444444')"
+                    ></div>
+                    <div 
+                        class="color-picker-cell"
+                        v-bind:style="{ backgroundColor: '#FF0000' }"
+                        v-on:click="() => handleColorClick('#FF0000')"
+                    ></div>
+                    <div 
+                        class="color-picker-cell"
+                        v-bind:style="{ backgroundColor: '#0000FF' }"
+                        v-on:click="() => handleColorClick('#0000FF')"
+                    ></div>
+                </div>
+            `,
+        });
+        Vue.component('book-question', {
+            delimiters: ['[[', ']]'],
+            props: [
+                'book',
+                'response',
+            ],
+            data: function() {
+                return {
+                    cellIndex: 0,
+                };
+            },
+            methods: {
+                setCellIndex: function(index) {
+                    this.cellIndex = index;
+                },
+                setCellColor: function(color) {
+                    this.$emit('set-response', this.book.id, this.cellIndex, color, []);
+                },
+            },
+            template: /*html*/`
+                <div class="book-question">
+                    <div class="text-column">
+                        <div class="genre">
+                            [[ book.genre ]]
+                        </div>
+                        <div class="content-box">
+                            <div class="booktitle">
+                                [[ book.title ]]
+                            </div>
+                            <div class="description">
+                                [[ book.description ]]
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="palette">
+                            <div 
+                                class="color-cell"
+                                v-for="(cell, i) in response.cells"
+                                v-bind:class="{ 'color-cell--active': i == cellIndex }"
+                                v-bind:style="{ backgroundColor: cell.color }"
+                                v-on:click="() => setCellIndex(i)"
+                            ></div>
+                        </div> 
+                        <div class="confidence-input">
+
+                        </div>
+                        <color-picker
+                            v-on:pick="setCellColor"
+                        ></color-picker>
+                    </div>
+                </div>
+            `,
+        });
+        var app = new Vue({
+            el: '#survey-app',
+            delimiters: ['[[', ']]'],
+            data: {
+                books: this._books,
+                responses: responses,
+                pageSize: 5,
+                page: 1,
+                pageBooks: [],
+                isNextPage: false,
+            },
+            created: function() {
+                this.setPageBooks();
+            },
+            methods: {
+                setPageBooks: function() {
+                    var minIndex = (this.page - 1) * this.pageSize;
+                    var maxIndex = Math.min(this.page * this.pageSize - 1, this.books.length);
+                    this.pageBooks = this.books.slice(minIndex, maxIndex + 1);
+                    this.isNextPage = maxIndex + 1 < this.books.length;
+                },
+                setResponse: function(bookId, cellIndex, color, tokens) {
+                    var newCells = this.responses[bookId].cells.slice(0);
+                    newCells[cellIndex] = {
+                        color: color,
+                        tokens: tokens,
+                    };
+                    this.responses[bookId].cells = newCells;
+                },
+                addSeconds: function(bookId, seconds) {
+                    this.responses[bookId].seconds += seconds;
+                },
+            },
+            watch: {
+                page: function() {
+                    this.setPageBooks();
+                },
+            },
+        });
+    </script>
+</body>
+</html>

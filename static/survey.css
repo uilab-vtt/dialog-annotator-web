@@ -1,0 +1,88 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 1080px;
+}
+
+.title {
+    margin: 0 auto;
+    padding: 22px 0;
+    font-size: 18px;
+    color: #444444;
+    text-align: center;
+}
+
+.book-question {
+    background-color: #eeeeee;
+    padding: 8px 8px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.text-column {
+    flex: 1 1 auto;
+}
+
+.genre {
+    padding: 4px 0;
+    font-size: 14px;
+    color: #444444;
+}
+
+.content-box {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    padding: 8px 8px;
+}
+
+.booktitle {
+    padding-bottom: 12px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.description {
+    font-size: 14px;
+}
+
+.form-column {
+    flex: 0 0 400px;
+}
+
+.palette {
+    padding: 8px 0;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+}
+
+.color-cell {
+    flex: 0 0 50px;
+    margin-right: 12px;
+    border: 3px solid #dddddd;
+    height: 50px;
+    cursor: pointer;
+}
+
+.color-cell--active {
+    border: 3px solid #444444;
+}
+
+.color-picker {
+    padding: 8px 0;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+.color-picker-cell {
+    flex: 0 0 20px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    height: 20px;
+    cursor: pointer;
+}
