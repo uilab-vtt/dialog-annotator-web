@@ -9,8 +9,29 @@ data_path = './data'
 response_path = './response'
 
 @app.route('/')
-def hello_world():
+def index():
     return 'color-annotator-web'
+
+def get_survey_links():
+    filenames = os.listdir('%s/books' % data_path)
+    links = []
+    for filename in filenames:
+        if filename.endswith('json'):
+            filename_strip = filename.split('.json')[0]
+            links.append(filename_strip)
+    links.sort()
+    return links
+
+def get_survey_results():
+    return [filename.split('.json')[0] for filename in os.listdir(response_path)]
+
+@app.route('/surveys/uilab4417')
+def survey_list():
+    return render_template('survey_list.html', links=get_survey_links())
+
+@app.route('/surveys/result/uilab4417')
+def survey_result():
+    return render_template('survey_result.html', filenames=get_survey_results())
 
 @app.route('/survey/<string:books_id>')
 def survey_index(books_id):
