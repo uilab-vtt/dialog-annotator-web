@@ -14,8 +14,48 @@ body {
 .title {
     margin: 0 auto;
     padding: 22px 0;
-    font-size: 18px;
+    font-size: 28px;
+    font-weight: bold;
     color: #444444;
+    text-align: center;
+}
+
+.content {
+    background-color: #eeeeee;
+    padding: 20px 12px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #444444;
+}
+
+.link-button {
+    display: inline-block;
+    background-color: #444444;
+    margin: 24px 0;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.link-button:hover {
+    background-color: #222222;
+}
+
+.pretest-image {
+    display: block;
+    margin: 18px 0;
+    max-width: 200px;
+    height: auto;
+}
+
+.survey-code {
+    background-color: #eeeeee;
+    padding: 20px 12px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #222222;
     text-align: center;
 }
 

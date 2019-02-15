@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Color Annotator</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="{{ url_for('static', filename='survey.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="title">
+            Color Annotation Study
+        </div>
+        <div class="content">
+            Welcome to Color Annotation Study.<br />
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+            sed do eiusmod tempor incididunt ut labore et dolore magna
+            aliqua. Ut enim ad minim veniam, quis nostrud exercitation 
+            ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            Duis aute irure dolor in reprehenderit in voluptate velit 
+            esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+            occaecat cupidatat non proident, sunt in culpa qui officia 
+            deserunt mollit anim id est laborum.<br />
+            <a class="link-button" href="/survey/{{ books_id }}/pretest">
+                Start
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

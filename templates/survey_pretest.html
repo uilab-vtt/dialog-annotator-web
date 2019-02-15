@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Color Annotator</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="{{ url_for('static', filename='survey.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="title">
+            Color Annotation Study
+        </div>
+        <div class="content">
+            <div class="form-section-title">
+                Pretest
+            </div>
+            <div class="form-section-description">
+                Please submit the answer for this pre-test to participate in our survey.
+            </div>
+
+            <div class="form-sub-section-title">
+                1. Enter the number shown in the image below.
+                <img class="pretest-image" src="{{ url_for('static', filename='color_digit_5.png') }}" alt="test">
+            </div>
+            <div class="token-input-wrapper">
+                <input id="c-input-1" class="token-input" value="">
+            </div>
+
+            <div class="form-sub-section-title">
+                2. Enter the number shown in the image below.
+                <img class="pretest-image" src="{{ url_for('static', filename='color_digit_12.png') }}" alt="test">
+            </div>
+            <div class="token-input-wrapper">
+                <input id="c-input-2" class="token-input" value="">
+            </div>
+
+            <div class="form-sub-section-title">
+                3. Enter the number shown in the image below.
+                <img class="pretest-image" src="{{ url_for('static', filename='color_digit_26.png') }}" alt="test">
+            </div>
+            <div class="token-input-wrapper">
+                <input id="c-input-3" class="token-input" value="">
+            </div>
+
+            <a class="link-button" onclick="handleSubmit()">
+                Submit
+            </a>
+        </div>
+    </div>
+    <script>
+        function validate(eid, value) {
+            return document.getElementById(eid).value.trim() === value;
+        }
+        function handleSubmit() {
+            if (validate('c-input-1', '5') && validate('c-input-2', '12') && validate('c-input-3', '26')) {
+                window.location.href = '/survey/{{ books_id }}/tasks';
+            } else {
+                alert('Sorry, you cannot participate in our survey if you cannot read the numbers in this page.');
+            }
+        }
+    </script>
+</body>
+
+</html>
