@@ -114,9 +114,9 @@
                 },
                 setCellColor: function(color) {
                     this.$emit('set-response', this.book.id, this.cellIndex, color, null);
-                    if (this.cellIndex < 5 - 1) {
-                        this.cellIndex += 1;
-                    }
+                },
+                setCellToken: function(e) {
+                    this.$emit('set-response', this.book.id, this.cellIndex, null, e.target.value);
                 },
                 setConfidence: function(value) {
                     this.$emit('set-confidence', this.book.id, value);
@@ -127,7 +127,7 @@
                 },
                 handleMouseOut: function() {
                     this.isActive = false;
-                    this.$emit('add-seconds', this.mouseTimestamp - Date.now());
+                    this.$emit('add-seconds', this.book.id, this.mouseTimestamp - Date.now());
                     this.mouseTimestamp = null;
                 },
             },
@@ -160,37 +160,53 @@
                         <div class="form-section-title">
                             Palette
                         </div>
-                        <div class="palette">
-                            <div 
-                                class="color-cell"
-                                v-for="(cell, i) in response.cells"
-                                v-bind:key="cell.color"
-                            >
+                        <div class="indented-content">
+                            <div class="palette">
                                 <div 
-                                    class="color-square"
-                                    v-bind:class="{ 'color-cell--active': i == cellIndex }"
-                                    v-bind:style="{ backgroundColor: cell.color }"
-                                    v-on:click="() => setCellIndex(i)"
-                                ></div>
-                                <div 
-                                    class="color-token"
+                                    class="color-cell"
+                                    v-for="(cell, i) in response.cells"
+                                    v-bind:key="i"
                                 >
-                                    [[ cell.token ]]
+                                    <div 
+                                        class="color-square"
+                                        v-bind:class="{ 'color-cell--active': i == cellIndex }"
+                                        v-bind:style="{ backgroundColor: cell.color }"
+                                        v-on:click="() => setCellIndex(i)"
+                                    ></div>
+                                    <div 
+                                        v-if="cell.token"
+                                        class="color-token"
+                                    >
+                                        [[ cell.token ]]
+                                    </div>
+                                    <div 
+                                        v-else
+                                        class="color-token color-token--error"
+                                    >
+                                        &lt;BLANK&gt;
+                                    </div>
                                 </div>
+                            </div> 
+                            <div class="form-sub-section-title">
+                                Color Picker for Palette
                             </div>
-                        </div> 
-                        <div class="form-section-title">
-                            Color Picker for Palette
-                        </div>
-                        <color-picker
-                            v-bind:colors="colors"
-                            v-on:pick="setCellColor"
-                        ></color-picker>
-                        <div class="form-section-title">
-                            Textbox for Palette
-                        </div>
-                        <div class="form-section-description">
-                            Choose one word from the text on the left side that is the most related to this color.
+                            <color-picker
+                                v-bind:colors="colors"
+                                v-on:pick="setCellColor"
+                            ></color-picker>
+                            <div class="form-sub-section-title">
+                                Textbox for Palette
+                            </div>
+                            <div class="form-section-description">
+                                Choose one word from the text on the left side that is the most related to this color.
+                            </div>
+                            <div class="token-input-wrapper">
+                                <input 
+                                class="token-input"
+                                v-on:input="setCellToken"
+                                v-bind:value="response.cells[cellIndex].token"
+                                >
+                            </div>
                         </div>
                         <div class="form-section-title">
                             Confidence on Your Palette
@@ -236,7 +252,7 @@
                     var newCells = this.responses[bookId].cells.slice(0);
                     newCells[cellIndex] = {
                         color: color || newCells[cellIndex].color,
-                        token: token || newCells[cellIndex].token,
+                        token: token === '' ? '' : token || newCells[cellIndex].token,
                     };
                     this.responses[bookId].cells = newCells;
                 },

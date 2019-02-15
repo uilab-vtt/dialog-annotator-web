@@ -27,7 +27,7 @@ def get_colors():
                 g = to_color_hex((255 / 3.0) * j)
                 b = to_color_hex((255 / 3.0) * k)
                 colors.append('#%s%s%s' % (r, g, b))
-    colors.sort(key=lambda x: int(x[1:3], 16) + int(x[3:5], 16) + int(x[5:], 16))
+    # colors.sort(key=lambda x: int(x[1:3], 16) + int(x[3:5], 16) + int(x[5:], 16))
     return colors
 
 @app.route('/survey/<string:user_id>')
