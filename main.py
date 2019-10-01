@@ -2,97 +2,132 @@ import os
 import json
 import time
 import random
-from flask import Flask, request, render_template
+from collections import Counter
+from flask import Flask, redirect, request, render_template
 
 app = Flask(__name__)
 data_path = './data'
+output_path = './output'
 response_path = './response'
+context_count_per_user = 10
+user_count_per_context = 3
+secret_code = 'under_slack_talk_'
+
+def init_paths():
+    paths = [
+        '%s/contexts' % data_path,
+        '%s/response' % output_path,
+        '%s/user_ids' % output_path,
+    ]
+    for path in paths:
+        if not os.path.exists(path):
+            os.makedirs(path)
 
 @app.route('/')
 def index():
-    return 'color-annotator-web'
+    return redirect('/tasks')
 
-def get_survey_links():
-    filenames = os.listdir('%s/books' % data_path)
-    links = []
-    for filename in filenames:
-        if filename.endswith('json'):
-            filename_strip = filename.split('.json')[0]
-            links.append(filename_strip)
-    links.sort()
-    return links
+def get_all_context_ids():
+    context_filenames = os.listdir('%s/contexts' % data_path)
+    context_ids = []
+    for filename in context_filenames:
+        if filename.endswith('.json'):
+            filename_strip = filename[:-5]
+            context_ids.append(filename_strip)
+    return context_ids
 
-def get_survey_results():
-    return [filename.split('.json')[0] for filename in os.listdir(response_path)]
+def get_context_response_count_dict():
+    context_ids = get_all_context_ids()
+    response_filenames = os.listdir('%s/response' % output_path)
+    counter = {cid: 0 for cid in context_ids}
+    for filename in response_filenames:
+        if '__res__' not in filename:
+            continue
+        split_filename = filename.split('__res__')
+        if len(split_filename) != 2 or not split_filename[1].endswith('.json'):
+            continue
+        context_id = split_filename[0]
+        counter[context_id] += 1
+    return counter
 
-@app.route('/surveys/uilab4417')
-def survey_list():
-    return render_template('survey_list.html', links=get_survey_links())
+def draw_context_ids():
+    count_dict = get_context_response_count_dict()
+    context_ids = []
+    while len(context_ids) < context_count_per_user:
+        # Draw a context that currently has minimum number of responses.
+        valid_counts = [count for cid, count in count_dict.items() if cid not in context_ids]
+        if not valid_counts:
+            break
+        min_count = min(valid_counts)
+        draw_box = [cid for cid, count in count_dict.items() if (count == min_count) and (cid not in context_ids)]
+        context_ids.append(random.choice(draw_box))
+    
+    return context_ids
 
-@app.route('/surveys/result/uilab4417')
-def survey_result():
-    return render_template('survey_result.html', filenames=get_survey_results())
+def get_context_dict(context_id):
+    file_path = '%s/contexts/%s.json' % (data_path, context_id)
+    with open(file_path, 'r') as f:
+        context_dict = json.load(f)
+    if 'id' not in context_dict:
+        context_dict['id'] = context_id
+    return context_dict
 
-@app.route('/survey/<string:books_id>')
-def survey_index(books_id):
-    return render_template('survey_index.html', books_id=books_id)
+def get_questions():
+    with open('%s/questions.json' % data_path, 'r') as f:
+        questions = json.load(f)
+    return questions
 
-@app.route('/survey/<string:books_id>/pretest')
-def survey_pretest(books_id):
-    return render_template('survey_pretest.html', books_id=books_id)
+def draw_context_dicts():
+    context_ids = draw_context_ids()
+    return [get_context_dict(cid) for cid in context_ids]
 
-def get_books(books_id):
-    with open('%s/books/%s.json' % (data_path, books_id), 'r') as f:
-        books = json.load(f)
-    return books
+def is_user_id(uid):
+    file_path = '%s/user_ids/%s.json' % (output_path, uid)
+    return os.path.exists(file_path)
 
-def to_color_hex(value):
-    hex_string = hex(int(value)).split('x')[1]
-    while len(hex_string) < 2:
-        hex_string = '0' + hex_string
-    return hex_string
+def generate_user_id():
+    while True:
+        uid = ''.join(random.choice('abcedfghijklmnopqrstuvwxyz0123456789') for i in range(16))
+        if not is_user_id(uid):
+            break
+    file_path = '%s/user_ids/%s.json' % (output_path, uid)
+    with open(file_path, 'w') as f:
+        f.write('!')
+    return uid
 
-def get_colors():
-    colors = []
-    for i in range(4):
-        for j in range(4):
-            for k in range(4):
-                r = to_color_hex((255 / 3.0) * i)
-                g = to_color_hex((255 / 3.0) * j)
-                b = to_color_hex((255 / 3.0) * k)
-                colors.append('#%s%s%s' % (r, g, b))
-    # colors.sort(key=lambda x: int(x[1:3], 16) + int(x[3:5], 16) + int(x[5:], 16))
-    return colors
+def save_response(context_id, user_id, response):
+    file_path = '%s/response/%s__res__%s.json' % (output_path, context_id, user_id)
+    with open(file_path, 'w') as f:
+        f.write(json.dumps(response))
 
-@app.route('/survey/<string:books_id>/tasks')
-def survey_tasks(books_id):
-    books = get_books(books_id)
-    colors = get_colors()
-    return render_template('survey_tasks.html', books_id=books_id, books=books, colors=colors)
+@app.route('/tasks')
+def task_index():
+    return render_template('task_index.html')
 
-def is_response(filename):
-    return os.path.exists('%s/%s.json' % (response_path, filename))
+@app.route('/tasks/draw')
+def task_draw():
+    uid = generate_user_id()
+    context_dicts = draw_context_dicts()
+    questions = get_questions()
+    return render_template(
+        'task_draw.html', uid=uid, contexts=context_dicts, questions=questions)
 
-def save_response(books_id, response):
-    ts = str(int(time.time() * 1000))
-    suffix = str(random.randint(0, 1000000))
-    filename = '%s_%s_%s' % (books_id, ts, suffix)
-    while is_response(filename):
-        filename += '_e'
-    with open('%s/%s.json' % (response_path, filename), 'w') as f:
-        json.dump(response, f)
-    return filename
-
-@app.route('/survey/<string:books_id>/submit', methods=['POST'])
-def survey_submit(books_id):
+@app.route('/tasks/submit', methods=['POST'])
+def task_submit():
     data = json.loads(request.data)
-    response = data['responses']
-    code = save_response(books_id, response)
-    return 'done:%s' % code
+    response = data['response']
+    user_id = data['uid']
 
-@app.route('/survey/<string:books_id>/done/<string:code>')
-def survey_done(books_id, code):
-    return render_template('survey_done.html', books_id=books_id, code=code)
+    for context_id, value in response.items():
+        save_response(context_id, user_id, value)
 
+    return 'done:%s' % (secret_code + user_id)
+
+@app.route('/tasks/done')
+def task_done():
+    code = request.args.get('code')
+    return render_template('task_done.html', code=code)
+
+init_paths()
 if __name__ == '__main__':
     app.run(debug=True)

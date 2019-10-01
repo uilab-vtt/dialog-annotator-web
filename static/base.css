@@ -1,0 +1,9 @@
+.v-padded {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.v-large-padded {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}

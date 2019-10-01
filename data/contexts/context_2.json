@@ -1,0 +1,9 @@
+{
+    "dialog": "**A**: \"2 When will Daddy come home?\"\n**B**: \"Soon, baby.\"\n**A**: \"But, he said he would be home for dinner,\"",
+    "candidates": {
+        "tfidf": "**B**: \"That is correct.\"",
+        "hred": "**B**: \"You think so, too?\"",
+        "vhcr": "**B**: \"You have to understand, dear.\"",
+        "human": "**B**: \"Daddy will be here in an hour. You wanna wait?\""
+    }
+}
