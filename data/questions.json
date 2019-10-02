@@ -1,13 +1,13 @@
 [
     {
         "id": "overall",
-        "text": "How appropriate is the response overall? (overall)",
+        "text": "How appropriate is the response overall?",
         "mintext": "Not appropriate at all",
         "maxtext": "Very appropriate"
     },
     {
         "id": "topic",
-        "text": "How on-topic is the response? (topicality)",
+        "text": "How on-topic is the response?",
         "mintext": "Not on-topic at all",
         "maxtext": "Very on-topic"
     }
