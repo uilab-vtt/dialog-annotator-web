@@ -8,7 +8,6 @@ from flask import Flask, redirect, request, render_template
 app = Flask(__name__)
 data_path = './data'
 output_path = './output'
-response_path = './response'
 context_count_per_user = 10
 user_count_per_context = 3
 secret_code = 'under_slack_talk_'
@@ -77,6 +76,11 @@ def get_questions():
         questions = json.load(f)
     return questions
 
+def get_validate_texts():
+    with open('%s/validate_texts.json' % data_path, 'r') as f:
+        validate_texts = json.load(f)
+    return validate_texts
+
 def draw_context_dicts():
     context_ids = draw_context_ids()
     return [get_context_dict(cid) for cid in context_ids]
@@ -109,8 +113,13 @@ def task_draw():
     uid = generate_user_id()
     context_dicts = draw_context_dicts()
     questions = get_questions()
+    validate_texts = get_validate_texts()
     return render_template(
-        'task_draw.html', uid=uid, contexts=context_dicts, questions=questions)
+        'task_draw.html', 
+        uid=uid, 
+        contexts=context_dicts,
+        questions=questions,
+        validate_texts=validate_texts)
 
 @app.route('/tasks/submit', methods=['POST'])
 def task_submit():
