@@ -206,12 +206,13 @@
                 // Validate the response.
                 let isValid = true;
                 let isPassed = true;
+                console.log('vv', this.validatorValues);
                 Object.keys(this.validatorValues).forEach(r => {
-                    Object.keys(r).forEach(qid => {
-                        if (r[qid].value === null) {
+                    Object.keys(this.validatorValues[r]).forEach(qid => {
+                        if (this.validatorValues[r][qid].value === null) {
                             isValid = false;
                         }
-                        if (!r[qid].passed) {
+                        if (!this.validatorValues[r][qid].passed) {
                             isPassed = false;
                         }
                     });
