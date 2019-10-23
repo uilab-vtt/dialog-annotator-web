@@ -36,7 +36,7 @@
                                         [[ question.mintext ]]
                                     </span>
                                     <button v-for="v in [1, 2, 3, 4, 5]" :key="v" class="button"
-                                        :class="{ 'is-active': isValidateValue(contextIndex, question.id, v) }"
+                                        :class="{ 'is-black': isValidateValue(contextIndex, question.id, v) }"
                                         @click="selectValidateValue(contextIndex, question.id, v, v === validateTexts[validateIndexes.indexOf(contextIndex)].value)">
                                         [[ v ]]
                                     </button>
@@ -206,7 +206,6 @@
                 // Validate the response.
                 let isValid = true;
                 let isPassed = true;
-                console.log('vv', this.validatorValues);
                 Object.keys(this.validatorValues).forEach(r => {
                     Object.keys(this.validatorValues[r]).forEach(qid => {
                         if (this.validatorValues[r][qid].value === null) {
@@ -237,21 +236,26 @@
                     alert('You have to answer to all questions.');
                     return;
                 }
-                if (!isPassed) {
-                    // Failed to pass the validity check. 
-                    window.location.href = '/tasks/done?code=' + encodeURI('pass_no_132v82389a823l3133id112');
-                    return;
-                }
+                // if (!isPassed) {
+                //     // Failed to pass the validity check. 
+                //     window.location.href = '/tasks/done?code=' + encodeURI('pass_no_132v82389a823l3133id112');
+                //     return;
+                // }
                 // Submit with AJAX call.
                 axios.post('/tasks/submit', {
                     response: this.response,
+                    isPassed: isPassed,
                     uid: this.uid,
                 }).then(response => {
                     const data = response.data;
                     const succeed = data.startsWith('done:');
                     if (succeed) {
                         const code = data.split(':')[1];
-                        window.location.href = '/tasks/done?code=' + encodeURI(code);
+                        if (isPassed) {
+                            window.location.href = '/tasks/done?code=' + encodeURI(code);
+                        } else {
+                            window.location.href = '/tasks/done?code=' + encodeURI('pass_no_132v82389a823l3133id112');
+                        }
                         this.resetValues();
                     } else {
                         alert('Error from server on submit: ' + response);
